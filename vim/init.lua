@@ -3,6 +3,7 @@ vim.opt.termguicolors = true
 require("settings")
 require("plugins")
 require("maps")
+require("cmp")
 
 -- Colorschemes
 

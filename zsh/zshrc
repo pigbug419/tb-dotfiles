@@ -148,6 +148,7 @@ export C_INCLUDE_PATH=$CUDA_HOME/extras/Debugger/include:$C_INCLUDE_PATH
 export CPP_INCLUDE_PATH=$CUDA_HOME/extras/Debugger/include:$CPP_INCLUDE_PATH
 export C_INCLUDE_PATH=$CUDA_HOME/extras/CUPTI/include:$C_INCLUDE_PATH
 export CPP_INCLUDE_PATH=$CUDA_HOME/extras/CUPIT/include:$CPP_INCLUDE_PATH
+export CUDA_DEVICE_ORDER=PCI_BUS_ID
 
 export VISUAL=nvim
 export EDITOR="$VISUAL"
@@ -156,7 +157,6 @@ export ORCA_HOME=$HOME/workspace/orca
 export HF_HUB_CACHE="/data/huggingface/hub"
 export HF_DATASETS_CACHE="/data/huggingface/datasets"
 
-export OPENAI_API_KEY=$(echo -n $(cat $HOME/.local/fai))
 
 # SPACESHIP PROMPT
 SPACESHIP_PROMPT_ADD_NEWLINE=false

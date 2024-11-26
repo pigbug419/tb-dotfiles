@@ -21,7 +21,7 @@ require("kanagawa").setup({
   terminalColors = true,       -- define vim.g.terminal_color_{0,17}
   colors = {                   -- add/modify theme and palette colors
     palette = {
-      fujiWhite = "#F0ECD5",
+      -- fujiWhite = "#F0ECD5",
     },
     theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
   },
@@ -88,27 +88,6 @@ require("monokai-pro").setup({
   override = function(c) end,
 })
 
--- onedark
-require("onedark").setup({
-  style = "dark",
-  code_style = {
-    comments = "italic",
-    keywords = "italic,bold",
-    functions = "bold",
-    strings = "none",
-    variables = "none"
-  },
-  lualine = {
-    transparent = false, -- lualine center bar transparency
-  },
-  -- Plugins Config --
-  diagnostics = {
-    darker = true, -- darker colors for diagnostic
-    undercurl = true,   -- use undercurl instead of underline for diagnostics
-    background = true,    -- use background color for virtual text
-  },
-})
-
 require("github-theme").setup({
   options = {
     dim_inactive = true,
@@ -146,7 +125,7 @@ require("tokyonight").setup({
   },
   sidebars = { "qf", "help" }, -- Set a darker background on sidebar-like windows. For example: `["qf", "vista_kind", "terminal", "packer"]`
   day_brightness = 0.3, -- Adjusts the brightness of the colors of the **Day** style. Number between 0 and 1, from dull to vibrant colors
-  hide_inactive_statusline = false, -- Enabling this option, will hide inactive statuslines and replace them with a thin border instead. Should work with the standard **StatusLine** and **LuaLine**.
+  hide_inactive_statusline = true, -- Enabling this option, will hide inactive statuslines and replace them with a thin border instead. Should work with the standard **StatusLine** and **LuaLine**.
   dim_inactive = true, -- dims inactive windows
   lualine_bold = true, -- When `true`, section headers in the lualine theme will be bold
 
@@ -168,7 +147,7 @@ vim.g.nightflyCursorColor = true
 
 -- catppuccin
 require("catppuccin").setup({
-  flavour = "frappe", -- latte, frappe, macchiato, mocha
+  flavour = "macchiato", -- latte, frappe, macchiato, mocha
   background = { -- :h background
     light = "latte",
     dark = "macchiato",
@@ -213,6 +192,81 @@ require("catppuccin").setup({
     },
     -- For more plugins integrations please scroll down (https://github.com/catppuccin/nvim#integrations)
   },
+})
+
+require("rose-pine").setup({
+  variant = "auto", -- auto, main, moon, or dawn
+  dark_variant = "main", -- main, moon, or dawn
+  dim_inactive_windows = false,
+  extend_background_behind_borders = true,
+
+  enable = {
+    terminal = true,
+    legacy_highlights = true, -- Improve compatibility for previous versions of Neovim
+    migrations = true, -- Handle deprecated options automatically
+  },
+
+  styles = {
+    bold = true,
+    italic = true,
+    transparency = false,
+  },
+
+  groups = {
+    border = "muted",
+    link = "iris",
+    panel = "surface",
+
+    error = "love",
+    hint = "iris",
+    info = "foam",
+    note = "pine",
+    todo = "rose",
+    warn = "gold",
+
+    git_add = "foam",
+    git_change = "rose",
+    git_delete = "love",
+    git_dirty = "rose",
+    git_ignore = "muted",
+    git_merge = "iris",
+    git_rename = "pine",
+    git_stage = "iris",
+    git_text = "rose",
+    git_untracked = "subtle",
+
+    h1 = "iris",
+    h2 = "foam",
+    h3 = "rose",
+    h4 = "gold",
+    h5 = "pine",
+    h6 = "foam",
+  },
+
+  palette = {
+    -- Override the builtin palette per variant
+    -- moon = {
+    --     base = '#18191a',
+    --     overlay = '#363738',
+    -- },
+  },
+
+  highlight_groups = {
+    -- Comment = { fg = "foam" },
+    -- VertSplit = { fg = "muted", bg = "muted" },
+  },
+
+  before_highlight = function(group, highlight, palette)
+    -- Disable all undercurls
+    -- if highlight.undercurl then
+    --     highlight.undercurl = false
+    -- end
+    --
+    -- Change palette colour
+    -- if highlight.fg == palette.pine then
+    --     highlight.fg = palette.foam
+    -- end
+  end,
 })
 
 vim.cmd("let g:everforest_background = 'hard'")

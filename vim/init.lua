@@ -9,13 +9,17 @@ require("cmp")
 
 -- kanagawa
 require("kanagawa").setup({
+  background = {
+    dark = "wave",
+    light = "lotus"
+  },
   compile = false,             -- enable compiling the colorscheme
-  undercurl = true,            -- enable undercurls
+  undercurl = false,            -- enable undercurls
   commentStyle = { italic = true },
   functionStyle = { bold = true },
-  keywordStyle = { italic = true, bold = true},
+  keywordStyle = { italic = false, bold = true},
   statementStyle = {},
-  typeStyle = {},
+  typeStyle = { bold = true },
   transparent = false,         -- do not set background color
   dimInactive = true,         -- dim inactive window `:h hl-NormalNC`
   terminalColors = true,       -- define vim.g.terminal_color_{0,17}
@@ -116,7 +120,7 @@ require("tokyonight").setup({
     -- Style to be applied to different syntax groups
     -- Value is any valid attr-list value for `:help nvim_set_hl`
     comments = { italic = true },
-    keywords = { italic = true, bold = true },
+    keywords = { italic = false, bold = true },
     functions = { bold = true },
     variables = {},
     -- Background styles. Can be "dark", "transparent" or "normal"
@@ -195,9 +199,9 @@ require("catppuccin").setup({
 })
 
 require("rose-pine").setup({
-  variant = "auto", -- auto, main, moon, or dawn
-  dark_variant = "main", -- main, moon, or dawn
-  dim_inactive_windows = false,
+  variant = "main", -- auto, main, moon, or dawn
+  dark_variant = "moon", -- main, moon, or dawn
+  dim_inactive_windows = true,
   extend_background_behind_borders = true,
 
   enable = {
@@ -208,7 +212,7 @@ require("rose-pine").setup({
 
   styles = {
     bold = true,
-    italic = true,
+    italic = false,
     transparency = false,
   },
 
@@ -258,9 +262,9 @@ require("rose-pine").setup({
 
   before_highlight = function(group, highlight, palette)
     -- Disable all undercurls
-    -- if highlight.undercurl then
-    --     highlight.undercurl = false
-    -- end
+    if highlight.undercurl then
+        highlight.undercurl = false
+    end
     --
     -- Change palette colour
     -- if highlight.fg == palette.pine then
@@ -287,7 +291,7 @@ require("gruvbox").setup({
   invert_tabline = false,
   invert_intend_guides = false,
   inverse = true, -- invert background for search, diffs, statuslines and errors
-  contrast = "hard", -- can be "hard", "soft" or empty string
+  contrast = "medium", -- can be "hard", "soft" or empty string
   palette_overrides = {},
   overrides = {},
   dim_inactive = false,
@@ -297,7 +301,7 @@ require("gruvbox").setup({
 require('material').setup({
 
     contrast = {
-        terminal = false, -- Enable contrast for the built-in terminal
+        terminal = true, -- Enable contrast for the built-in terminal
         sidebars = true, -- Enable contrast for sidebar-like windows ( for example Nvim-Tree )
         floating_windows = true, -- Enable contrast for floating windows
         cursor_line = true, -- Enable darker background for the cursor line
@@ -357,5 +361,107 @@ require('material').setup({
     lualine_style = "default", -- Lualine style ( can be 'stealth' or 'default' )
 })
 
+require("nightfox").setup({
+  options = {
+    -- Compiled file's destination location
+    compile_path = vim.fn.stdpath("cache") .. "/nightfox",
+    compile_file_suffix = "_compiled", -- Compiled file suffix
+    transparent = false,     -- Disable setting background
+    terminal_colors = true,  -- Set terminal colors (vim.g.terminal_color_*) used in `:terminal`
+    dim_inactive = true,    -- Non focused panes set to alternative background
+    module_default = true,   -- Default enable value for modules
+    colorblind = {
+      enable = false,        -- Enable colorblind support
+      simulate_only = false, -- Only show simulated colorblind colors and not diff shifted
+      severity = {
+        protan = 0,          -- Severity [0,1] for protan (red)
+        deutan = 0,          -- Severity [0,1] for deutan (green)
+        tritan = 0,          -- Severity [0,1] for tritan (blue)
+      },
+    },
+    styles = {               -- Style to be applied to different syntax groups
+      comments = "italic",     -- Value is any valid attr-list value `:help attr-list`
+      conditionals = "bold",
+      constants = "bold",
+      functions = "NONE",
+      keywords = "bold",
+      numbers = "NONE",
+      operators = "NONE",
+      strings = "NONE",
+      types = "NONE",
+      variables = "NONE",
+    },
+    inverse = {             -- Inverse highlight for different types
+      match_paren = false,
+      visual = false,
+      search = false,
+    },
+    modules = {             -- List of various plugins and additional options
+      -- ...
+    },
+  },
+  palettes = {},
+  specs = {},
+  groups = {},
+})
+
+require("nordic").setup({
+  -- This callback can be used to override the colors used in the base palette.
+  on_palette = function(palette) end,
+  -- This callback can be used to override the colors used in the extended palette.
+  after_palette = function(palette) end,
+  -- This callback can be used to override highlights before they are applied.
+  on_highlight = function(highlights, _palette)
+    for _, highlight in pairs(highlights) do
+      highlight.italic = false
+      highlight.underline = false
+    end
+  end,
+  -- Enable bold keywords.
+  bold_keywords = true,
+  -- Enable italic comments.
+  italic_comments = true,
+  -- Enable editor background transparency.
+  transparent = {
+    -- Enable transparent background.
+    bg = false,
+    -- Enable transparent background for floating windows.
+    float = false,
+  },
+  -- Enable brighter float border.
+  bright_border = false,
+  -- Reduce the overall amount of blue in the theme (diverges from base Nord).
+  reduced_blue = true,
+  -- Swap the dark background with the normal one.
+  swap_backgrounds = false,
+  -- Cursorline options.  Also includes visual/selection.
+  cursorline = {
+    -- Bold font in cursorline.
+    bold = false,
+    -- Bold cursorline number.
+    bold_number = true,
+    -- Available styles: 'dark', 'light'.
+    theme = "dark",
+    -- Blending the cursorline bg with the buffer bg.
+    blend = 0.85,
+  },
+  noice = {
+    -- Available styles: `classic`, `flat`.
+    style = "classic",
+  },
+  telescope = {
+    -- Available styles: `classic`, `flat`.
+    style = "flat",
+  },
+  leap = {
+    -- Dims the backdrop when using leap.
+    dim_backdrop = true,
+  },
+  ts_context = {
+    -- Enables dark background for treesitter-context window
+    dark_background = true,
+  }
+})
+
 vim.cmd("let g:everforest_background = 'hard'")
-vim.cmd("colorscheme tokyonight")
+vim.cmd("colorscheme kanagawa")

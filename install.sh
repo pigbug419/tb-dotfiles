@@ -115,7 +115,7 @@ function install_node {
   NODE_DIR="${HOME}/.local/node"
   if [ ! -d ${NODE_DIR} ] ;
   then
-    NODE_VERSION="v24.13.0"
+    NODE_VERSION="v24.14.0"
     NODE_TAR_FILE="node-${NODE_VERSION}-linux-x64.tar.xz"
     wget "https://nodejs.org/dist/${NODE_VERSION}/${NODE_TAR_FILE}" -P "${HOME}/.local"
     mkdir -p "${HOME}/.local/node" && tar -xvf "${HOME}/.local/${NODE_TAR_FILE}" -C "${HOME}/.local/node" --strip-components=1
@@ -158,7 +158,7 @@ function install_llvm {
     UBUNTU_MAJOR_VERSION="$(lsb_release -rs | cut -d. -f1)"
     if [ ${UBUNTU_MAJOR_VERSION} = "24" ] || [ ${UBUNTU_MAJOR_VERSION} = "22" ]
     then
-      LLVM_VERSION="20.1.4"
+      LLVM_VERSION="22.1.1"
       LLVM_TAR_FILE="LLVM-${LLVM_VERSION}-Linux-X64.tar.xz"
     else
       LLVM_VERSION="18.1.8"
@@ -186,7 +186,7 @@ function install_cmake {
   echo "Install cmake..."
   if [ ! -f "${HOME}/.local/cmake" ];
   then
-    CMAKE_VERSION="3.31.5"
+    CMAKE_VERSION="3.31.11"
     CMAKE_TAR_FILE="cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz"
     wget "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_TAR_FILE}" -P ${HOME}/.local
     mkdir -p "${HOME}/.local/cmake" && tar -zxvf "${HOME}/.local/${CMAKE_TAR_FILE}" -C "${HOME}/.local/cmake" --strip-components=1
@@ -198,11 +198,27 @@ function install_gh {
   echo "Install gh..."
   if [ ! -f "${HOME}/.local/gh/bin/gh" ];
   then
-    GH_VERSION="2.83.2"
+    GH_VERSION="2.88.0"
     GH_TAR_FILE="gh_${GH_VERSION}_linux_amd64.tar.gz"
     wget "https://github.com/cli/cli/releases/download/v${GH_VERSION}/${GH_TAR_FILE}"
     mkdir -p "${HOME}/.local/gh" && tar -zxvf "${GH_TAR_FILE}" -C "${HOME}/.local/gh" --strip-components=1
     rm -f "${GH_TAR_FILE}"
+  fi
+}
+
+function install_claude {
+  echo "Install claude..."
+  if [ ! -f "${HOME}/.local/bin/claude" ];
+  then
+    curl -fsSL https://claude.ai/install.sh | bash
+  fi
+}
+
+function install_opencode {
+  echo "Install opencode..."
+  if [ ! -f "${HOME}/.opencode/bin/opencode" ];
+  then
+    curl -fsSL https://opencode.ai/install | bash
   fi
 }
 
@@ -220,6 +236,9 @@ then
   install_llvm
   install_fzf
   install_cmake
+  install_gh
+  install_claude
+  install_opencode
 elif [ "${INSTALL_TARGET}" == "nvim" ] ;
 then
   install_nvim

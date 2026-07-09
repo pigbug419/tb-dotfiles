@@ -10,7 +10,7 @@ return {
       tokyonight.setup({
         -- your configuration comes here
         -- or leave it empty to use the default settings
-        style = "night", -- The theme comes in three styles, `storm`, `moon`, a darker variant `night` and `day`
+        style = "storm", -- The theme comes in three styles, `storm`, `moon`, a darker variant `night` and `day`
         light_style = "day", -- The theme is used when the background is set to light
         transparent = false, -- Enable this to disable setting the background color
         terminal_colors = true, -- Configure the colors used when opening a `:terminal` in [Neovim](https://github.com/neovim/neovim)
@@ -34,13 +34,36 @@ return {
         --- You can override specific color groups to use other groups or a hex color
         --- function will be called with a ColorScheme table
         ---@param colors ColorScheme
-        on_colors = function(colors) end,
+        on_colors = function(c)
+          local old_bg = c.bg
+          c.bg = "#e6e7ec"
+          c.bg_dark = old_bg
+        end,
 
         --- You can override specific highlights to use other groups or a hex color
         --- function will be called with a Highlights and ColorScheme table
         ---@param highlights Highlights
         ---@param colors ColorScheme
-        on_highlights = function(highlights, colors) end,
+        on_highlights = function(hl, c)
+          hl.NvimTreeNormal = { bg = c.bg_dark }
+          hl.NvimTreeNormalNC = { bg = c.bg_dark }
+          hl.NvimTreeEndOfBuffer = { fg = c.bg_dark, bg = c.bg_dark }
+          hl.TelescopeNormal = { bg = c.bg_dark }
+          hl.TelescopeBorder = { fg = c.bg_highlight, bg = c.bg_dark }
+          hl.TelescopePromptNormal = { bg = c.bg_dark }
+          hl.TelescopePromptBorder = { fg = c.bg_highlight, bg = c.bg_dark }
+          hl.TelescopeResultsNormal = { bg = c.bg_dark }
+          hl.TelescopeResultsBorder = { fg = c.bg_highlight, bg = c.bg_dark }
+          hl.TelescopePreviewNormal = { bg = c.bg_dark }
+          hl.TelescopePreviewBorder = { fg = c.bg_highlight, bg = c.bg_dark }
+          hl.TelescopeSelection = { bg = c.bg_highlight }
+          hl.TelescopeSelectionCaret = { fg = c.blue, bg = c.bg_highlight }
+          hl.TelescopeMatching = { fg = c.blue, bold = true }
+          hl.TelescopeTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
+          hl.TelescopePromptTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
+          hl.TelescopeResultsTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
+          hl.TelescopePreviewTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
+        end,
 
         cache = true, -- When set to true, the theme will be cached for better performance
 
@@ -284,7 +307,7 @@ return {
         flavour = "auto", -- latte, frappe, macchiato, mocha
         background = { -- :h background
           light = "latte",
-          dark = "macchiato",
+          dark = "frappe",
         },
         transparent_background = false, -- disables setting the background color.
         show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
@@ -314,32 +337,34 @@ return {
         },
         color_overrides = {
           latte = {
-            rosewater = "#c14a4a",
-            flamingo = "#c14a4a",
-            red = "#c14a4a",
-            maroon = "#c14a4a",
-            pink = "#945e80",
-            mauve = "#945e80",
-            peach = "#c35e0a",
-            yellow = "#b47109",
-            green = "#6c782e",
-            teal = "#4c7a5d",
-            sky = "#4c7a5d",
-            sapphire = "#4c7a5d",
-            blue = "#45707a",
-            lavender = "#45707a",
-            text = "#654735",
-            subtext1 = "#73503c",
-            subtext0 = "#805942",
-            overlay2 = "#8c6249",
-            overlay1 = "#8c856d",
-            overlay0 = "#a69d81",
-            surface2 = "#bfb695",
-            surface1 = "#d1c7a3",
-            surface0 = "#e3dec3",
-            base = "#ede9e2", -- background
-            mantle = "#e6e1da", -- dim background
-            crust = "#e8e3c8",
+            rosewater = "#d75f00",
+            flamingo = "#d7005f",
+            pink = "#d70087",
+            mauve = "#8700af",
+            red = "#d70000",
+            maroon = "#af0000",
+            peach = "#d75f00",
+            yellow = "#af5f00",
+            green = "#5f8700",
+            teal = "#00af5f",
+            sky = "#0087af",
+            sapphire = "#005f87",
+            blue = "#005faf",
+            lavender = "#005faf",
+            text = "#444444",
+            subtext1 = "#5f5f5f",
+            subtext0 = "#6c6c6c",
+            overlay2 = "#878787",
+            overlay1 = "#949494",
+            overlay0 = "#a8a8a8",
+            surface2 = "#b2b2b2",
+            surface1 = "#bcbcbc",
+            surface0 = "#c6c6c6", -- line separator
+            -- base = "#e4e4e4",  -- background
+            base = "#eeeeee", -- background
+            -- mantle = "#dcdcdc",  -- dim background
+            mantle = "#e8e8e8", -- dim background
+            crust = "#d0d0d0",
           },
           macchiato = {
             rosewater = "#F5B8AB",
@@ -370,34 +395,92 @@ return {
             crust = "#191926",
           },
           mocha = {
-            rosewater = "#ea6962",
-            flamingo = "#ea6962",
-            red = "#ea6962",
-            maroon = "#ea6962",
-            pink = "#d3869b",
-            mauve = "#d3869b",
-            peach = "#e78a4e",
-            yellow = "#d8a657",
-            green = "#a9b665",
-            teal = "#89b482",
-            sky = "#89b482",
-            sapphire = "#89b482",
-            blue = "#7daea3",
-            lavender = "#7daea3",
-            text = "#ebdbb2",
-            subtext1 = "#d5c4a1",
-            subtext0 = "#bdae93",
-            overlay2 = "#a89984",
-            overlay1 = "#928374",
-            overlay0 = "#595959",
-            surface2 = "#4d4d4d",
-            surface1 = "#404040",
-            surface0 = "#292929",
-            base = "#1d2021",
-            mantle = "#191b1c",
-            crust = "#141617",
+            -- rosewater = "#ea6962",
+            -- flamingo = "#ea6962",
+            -- red = "#ea6962",
+            -- maroon = "#ea6962",
+            -- pink = "#d3869b",
+            -- mauve = "#d3869b",
+            -- peach = "#e78a4e",
+            -- yellow = "#d8a657",
+            -- green = "#a9b665",
+            -- teal = "#89b482",
+            -- sky = "#89b482",
+            -- sapphire = "#89b482",
+            -- blue = "#7daea3",
+            -- lavender = "#7daea3",
+            -- text = "#ebdbb2",
+            -- subtext1 = "#d5c4a1",
+            -- subtext0 = "#bdae93",
+            -- overlay2 = "#a89984",
+            -- overlay1 = "#928374",
+            -- overlay0 = "#595959",
+            -- surface2 = "#4d4d4d",
+            -- surface1 = "#404040",
+            -- surface0 = "#292929",
+            -- base = "#1d2021",
+            -- mantle = "#191b1c",
+            -- crust = "#141617",
+            rosewater = "#A88A8B",
+            flamingo = "#BC9099",
+            red = "#A84F4C",
+            maroon = "#a07474",
+            pink = "#A88A8B",
+            mauve = "#c66d86",
+            peach = "#ce8f6b",
+            yellow = "#E5B561",
+            green = "#9BB8B8",
+            teal = "#588383",
+            sky = "#719DBC",
+            sapphire = "#3587BA",
+            blue = "#688ACB",
+            lavender = "#93b2b2",
+            text = "#dfe0e0",
+            subtext1 = "#d4d4d4",
+            subtext0 = "#8a896a",
+            overlay2 = "#8a896a",
+            overlay1 = "#555555",
+            overlay0 = "#545250",
+            surface2 = "#545454",
+            surface1 = "#545250",
+            surface0 = "#4c4c4c",
+            base = "#2E3330",
+            mantle = "#272C29",
+            crust = "#212522",
+          },
+          frappe = {
+            rosewater = "#F92672",
+            flamingo = "#F92672",
+            red = "#F92672",
+            maroon = "#F92672",
+            pink = "#AE81FF",
+            mauve = "#AE81FF",
+            peach = "#FD971F",
+            yellow = "#E6DB74",
+            green = "#A6E22E",
+            teal = "#E6DB74",
+            sky = "#66D9EF",
+            sapphire = "#66D9EF",
+            blue = "#66D9EF",
+            lavender = "#AE81FF",
+            text = "#F8F8F2",
+            subtext1 = "#BCBCBC",
+            subtext0 = "#A0A0A0",
+            overlay2 = "#8F8F8F",
+            overlay1 = "#465457",
+            overlay0 = "#75715E",
+            surface2 = "#49483E",
+            surface1 = "#3E3D32",
+            surface0 = "#3B3A32",
+            base = "#272822",
+            mantle = "#232420",
+            -- base = "#1B1D1E",
+            -- mantle = "#121212",
+            crust = "#1E1F1C",
           },
           integrations = {
+            window_picker = true,
+            diffview = true,
             telescope = {
               enabled = true,
               style = "nvchad",
@@ -711,12 +794,55 @@ return {
               ["@lsp.type.variable"] = { link = "TSVariable" },
             }
           end,
+          frappe = function(colors)
+            return {
+              Type = { fg = colors.blue, style = { "bold" } },
+              TSType = { fg = colors.blue, style = { "bold" } },
+              TSTypeBuiltin = { fg = colors.blue, style = { "bold" } },
+              TSTypeDefinition = { fg = colors.blue, style = { "bold" } },
+              TSTypeQualifier = { fg = colors.peach, style = { "bold" } },
+              TSVariable = { fg = colors.text },
+              Typedef = { fg = colors.blue },
+              Structure = { fg = colors.blue },
+              Define = { fg = colors.blue },
+              SpecialChar = { fg = colors.red },
+              PreProc = { fg = colors.green },
+              PreCondit = { fg = colors.green, style = { "bold" } },
+              Macro = { fg = "#C4BE89" },
+              ["@type.builtin"] = { fg = colors.blue, style = { "bold" } },
+              ["@variable"] = { fg = colors.text },
+              ["@variable.declaration"] = { fg = colors.text },
+              ["@lsp.mod.defaultLibrary"] = { fg = colors.blue, style = { "bold" } },
+              ["@lsp.type.variable"] = { fg = colors.text },
+              ["@lsp.type.keyword"] = { fg = colors.red },
+              ["@lsp.type.namespace.cpp"] = { fg = colors.red },
+              ["@lsp.typemod.namespace.globalScope.cpp"] = { fg = colors.red },
+            }
+          end,
           latte = function(colors)
             return {
               IblIndent = { fg = colors.mantle },
               IblScope = { fg = colors.surface1 },
-
               LineNr = { fg = colors.surface1 },
+              NvimTreeCursorLine = { bg = colors.surface0 },
+              NvimTreeNormal = { bg = colors.base },
+              NvimTreeNormalNC = { bg = colors.base },
+              NvimTreeEndOfBuffer = { fg = colors.base, bg = colors.base },
+              TelescopeNormal = { bg = colors.base },
+              TelescopeBorder = { fg = colors.blue, bg = colors.mantle },
+              TelescopePromptNormal = { bg = colors.base },
+              TelescopePromptBorder = { fg = colors.blue, bg = colors.base },
+              TelescopeResultsNormal = { bg = colors.base },
+              TelescopeResultsBorder = { fg = colors.blue, bg = colors.base },
+              TelescopePreviewNormal = { bg = colors.base },
+              TelescopePreviewBorder = { fg = colors.blue, bg = colors.base },
+              TelescopeSelection = { bg = colors.surface0 },
+              TelescopeSelectionCaret = { fg = colors.sky, bg = colors.base },
+              TelescopeMatching = { fg = colors.sky, bold = true },
+              TelescopeTitle = { fg = colors.blue, bg = colors.base, bold = true },
+              TelescopePromptTitle = { fg = colors.blue, bg = colors.base, bold = true },
+              TelescopeResultsTitle = { fg = colors.blue, bg = colors.base, bold = true },
+              TelescopePreviewTitle = { fg = colors.blue, bg = colors.base, bold = true },
             }
           end,
         },

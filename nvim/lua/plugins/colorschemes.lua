@@ -307,7 +307,7 @@ return {
         flavour = "auto", -- latte, frappe, macchiato, mocha
         background = { -- :h background
           light = "latte",
-          dark = "frappe",
+          dark = "macchiato",
         },
         transparent_background = false, -- disables setting the background color.
         show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
@@ -843,6 +843,8 @@ return {
               TelescopePromptTitle = { fg = colors.blue, bg = colors.base, bold = true },
               TelescopeResultsTitle = { fg = colors.blue, bg = colors.base, bold = true },
               TelescopePreviewTitle = { fg = colors.blue, bg = colors.base, bold = true },
+              TroubleNormal = { bg = colors.base },
+              TroubleNormalNC = { bg = colors.base },
             }
           end,
         },

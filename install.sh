@@ -3,14 +3,31 @@
 # Assumption: zsh & oh-my-zsh is installed
 
 DOTFILES="$(pwd)"
+PLATFORM_OS="$(uname -s)"
+PLATFORM_ARCH="$(uname -m)"
+
+function unsupported_platform {
+  echo "Unsupported platform: ${PLATFORM_OS} ${PLATFORM_ARCH}"
+  return 1
+}
 
 function install_conda {
   echo "Install conda..."
   if [ ! -x "$(command -v conda)" ] ;
   then
-    wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh --directory-prefix=${HOME}/.local
-    sh ${HOME}/.local/Miniconda3-latest-Linux-x86_64.sh -b -p ${HOME}/program/miniconda3
-    rm ${HOME}/.local/Miniconda3-latest-Linux-x86_64.sh
+    case "${PLATFORM_OS}:${PLATFORM_ARCH}" in
+      Linux:x86_64) CONDA_INSTALLER="Miniconda3-latest-Linux-x86_64.sh" ;;
+      Linux:aarch64|Linux:arm64) CONDA_INSTALLER="Miniconda3-latest-Linux-aarch64.sh" ;;
+      Darwin:arm64) CONDA_INSTALLER="Miniconda3-latest-MacOSX-arm64.sh" ;;
+      Darwin:x86_64) CONDA_INSTALLER="Miniconda3-latest-MacOSX-x86_64.sh" ;;
+      *) unsupported_platform; return 1 ;;
+    esac
+
+    CONDA_INSTALLER_PATH="${HOME}/.local/${CONDA_INSTALLER}"
+    mkdir -p "${HOME}/.local" "${HOME}/program"
+    curl -fL "https://repo.anaconda.com/miniconda/${CONDA_INSTALLER}" -o "${CONDA_INSTALLER_PATH}"
+    sh "${CONDA_INSTALLER_PATH}" -b -p "${HOME}/program/miniconda3"
+    rm "${CONDA_INSTALLER_PATH}"
   fi
 }
 
@@ -48,7 +65,61 @@ function install_zsh {
   ln -s ${DOTFILES}/zsh/zshrc ${ZSHRC_PATH}
 }
 
+function install_starship {
+  echo "Install starship..."
+  if [ ! -x "$(command -v starship)" ] ;
+  then
+    mkdir -p "${HOME}/.local/bin"
+    curl -sS https://starship.rs/install.sh | sh -s -- -y -b "${HOME}/.local/bin"
+  fi
+
+  STARSHIP_CONFIG_PATH="${HOME}/.config/starship.toml"
+  mkdir -p "${HOME}/.config"
+
+  if [ -L "${STARSHIP_CONFIG_PATH}" ] ;
+  then
+    unlink "${STARSHIP_CONFIG_PATH}"
+  fi
+
+  if [ -f "${STARSHIP_CONFIG_PATH}" ] ;
+  then
+    rm "${STARSHIP_CONFIG_PATH}"
+  fi
+
+  ln -s "${DOTFILES}/starship/starship.toml" "${STARSHIP_CONFIG_PATH}"
+}
+
+function install_ghostty {
+  if [ "${PLATFORM_OS}" != "Darwin" ] ;
+  then
+    echo "Skip ghostty config: macOS only"
+    return
+  fi
+
+  echo "Install ghostty config..."
+  GHOSTTY_CONFIG_PATH="${HOME}/.config/ghostty"
+  mkdir -p "${HOME}/.config"
+
+  if [ -L "${GHOSTTY_CONFIG_PATH}" ] ;
+  then
+    unlink "${GHOSTTY_CONFIG_PATH}"
+  fi
+
+  if [ -e "${GHOSTTY_CONFIG_PATH}" ] ;
+  then
+    rm -r "${GHOSTTY_CONFIG_PATH}"
+  fi
+
+  ln -s "${DOTFILES}/ghostty" "${GHOSTTY_CONFIG_PATH}"
+}
+
 function install_nvim {
+  if [ "${PLATFORM_OS}" != "Linux" ] ;
+  then
+    echo "Skip nvim: Linux only"
+    return
+  fi
+
   echo "Install nvim..."
 
   if [ ! -d "${HOME}/.local/nvim" ] ;
@@ -58,8 +129,8 @@ function install_nvim {
     sudo apt-get update && sudo apt-get install -y ninja-build gettext cmake unzip curl
     cd ${HOME}/program/neovim
     git fetch --tags
-    LATEST_TAG=$(git describe --abbrev=0)
-    git checkout ${LATEST_TAG}
+    LATEST_TAG=$(git tag --sort=-v:refname | awk '/^v[0-9]+\.[0-9]+\.[0-9]+$/ { print; exit }')
+    git checkout "${LATEST_TAG}"
     make CMAKE_BUILD_TYPE=Release CMAKE_INSTALL_PREFIX=${HOME}/.local/nvim install
     cd ${DOTFILES}
   fi
@@ -116,9 +187,18 @@ function install_node {
   if [ ! -d ${NODE_DIR} ] ;
   then
     NODE_VERSION="v24.14.0"
-    NODE_TAR_FILE="node-${NODE_VERSION}-linux-x64.tar.xz"
-    wget "https://nodejs.org/dist/${NODE_VERSION}/${NODE_TAR_FILE}" -P "${HOME}/.local"
-    mkdir -p "${HOME}/.local/node" && tar -xvf "${HOME}/.local/${NODE_TAR_FILE}" -C "${HOME}/.local/node" --strip-components=1
+    case "${PLATFORM_OS}:${PLATFORM_ARCH}" in
+      Linux:x86_64) NODE_PLATFORM="linux-x64"; NODE_EXTENSION="tar.xz" ;;
+      Linux:aarch64|Linux:arm64) NODE_PLATFORM="linux-arm64"; NODE_EXTENSION="tar.xz" ;;
+      Darwin:arm64) NODE_PLATFORM="darwin-arm64"; NODE_EXTENSION="tar.gz" ;;
+      Darwin:x86_64) NODE_PLATFORM="darwin-x64"; NODE_EXTENSION="tar.gz" ;;
+      *) unsupported_platform; return 1 ;;
+    esac
+
+    NODE_TAR_FILE="node-${NODE_VERSION}-${NODE_PLATFORM}.${NODE_EXTENSION}"
+    mkdir -p "${HOME}/.local/node"
+    curl -fL "https://nodejs.org/dist/${NODE_VERSION}/${NODE_TAR_FILE}" -o "${HOME}/.local/${NODE_TAR_FILE}"
+    tar -xf "${HOME}/.local/${NODE_TAR_FILE}" -C "${HOME}/.local/node" --strip-components=1
     rm -f "${HOME}/.local/${NODE_TAR_FILE}"
   fi
 }
@@ -145,9 +225,11 @@ function install_rust {
   echo "Install rust..."
   if [ ! -x "$(command -v cargo)" ] ;
   then
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
   fi
-  cargo install ripgrep fd-find tree-sitter-cli stylua
+
+  export PATH="${HOME}/.cargo/bin:${PATH}"
+  cargo install tree-sitter-cli stylua
 }
 
 function install_llvm {
@@ -155,17 +237,18 @@ function install_llvm {
   LLVM_DIR="${HOME}/.local/llvm"
   if [ ! -d ${LLVM_DIR} ] ;
   then
-    UBUNTU_MAJOR_VERSION="$(lsb_release -rs | cut -d. -f1)"
-    if [ ${UBUNTU_MAJOR_VERSION} = "24" ] || [ ${UBUNTU_MAJOR_VERSION} = "22" ]
-    then
-      LLVM_VERSION="22.1.1"
-      LLVM_TAR_FILE="LLVM-${LLVM_VERSION}-Linux-X64.tar.xz"
-    else
-      LLVM_VERSION="18.1.8"
-      LLVM_TAR_FILE="clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
-    fi
-    wget "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/${LLVM_TAR_FILE}" -P ${HOME}/.local
-    mkdir -p "${HOME}/.local/llvm" && tar -xvf "${HOME}/.local/${LLVM_TAR_FILE}" -C "${HOME}/.local/llvm" --strip-components=1
+    LLVM_VERSION="23.1.2"
+    case "${PLATFORM_OS}:${PLATFORM_ARCH}" in
+      Linux:x86_64) LLVM_PLATFORM="Linux-X64" ;;
+      Linux:aarch64|Linux:arm64) LLVM_PLATFORM="Linux-ARM64" ;;
+      Darwin:arm64) LLVM_PLATFORM="macOS-ARM64" ;;
+      *) unsupported_platform; return 1 ;;
+    esac
+
+    LLVM_TAR_FILE="LLVM-${LLVM_VERSION}-${LLVM_PLATFORM}.tar.xz"
+    mkdir -p "${HOME}/.local/llvm"
+    curl -fL "https://github.com/llvm/llvm-project/releases/download/llvmorg-${LLVM_VERSION}/${LLVM_TAR_FILE}" -o "${HOME}/.local/${LLVM_TAR_FILE}"
+    tar -xf "${HOME}/.local/${LLVM_TAR_FILE}" -C "${HOME}/.local/llvm" --strip-components=1
     rm -f "${HOME}/.local/${LLVM_TAR_FILE}"
   fi
 }
@@ -175,22 +258,45 @@ function install_fzf {
   if [ ! -f "${HOME}/.local/bin/fzf" ];
   then
     FZF_VERSION="0.62.0"
-    FZF_TAR_FILE="fzf-${FZF_VERSION}-linux_amd64.tar.gz"
-    wget "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/${FZF_TAR_FILE}" -P ${HOME}/.local
-    mkdir -p "${HOME}/.local/bin" && tar -zxvf "${HOME}/.local/${FZF_TAR_FILE}" -C "${HOME}/.local/bin"
+    case "${PLATFORM_OS}:${PLATFORM_ARCH}" in
+      Linux:x86_64) FZF_PLATFORM="linux_amd64" ;;
+      Linux:aarch64|Linux:arm64) FZF_PLATFORM="linux_arm64" ;;
+      Darwin:arm64) FZF_PLATFORM="darwin_arm64" ;;
+      Darwin:x86_64) FZF_PLATFORM="darwin_amd64" ;;
+      *) unsupported_platform; return 1 ;;
+    esac
+
+    FZF_TAR_FILE="fzf-${FZF_VERSION}-${FZF_PLATFORM}.tar.gz"
+    mkdir -p "${HOME}/.local/bin"
+    curl -fL "https://github.com/junegunn/fzf/releases/download/v${FZF_VERSION}/${FZF_TAR_FILE}" -o "${HOME}/.local/${FZF_TAR_FILE}"
+    tar -xf "${HOME}/.local/${FZF_TAR_FILE}" -C "${HOME}/.local/bin"
     rm -f "${HOME}/.local/${FZF_TAR_FILE}"
   fi
 }
 
 function install_cmake {
   echo "Install cmake..."
-  if [ ! -f "${HOME}/.local/cmake" ];
+  CMAKE_DIR="${HOME}/.local/cmake"
+  if [ ! -d "${CMAKE_DIR}" ];
   then
     CMAKE_VERSION="3.31.11"
-    CMAKE_TAR_FILE="cmake-${CMAKE_VERSION}-linux-x86_64.tar.gz"
-    wget "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_TAR_FILE}" -P ${HOME}/.local
-    mkdir -p "${HOME}/.local/cmake" && tar -zxvf "${HOME}/.local/${CMAKE_TAR_FILE}" -C "${HOME}/.local/cmake" --strip-components=1
+    case "${PLATFORM_OS}:${PLATFORM_ARCH}" in
+      Linux:x86_64) CMAKE_PLATFORM="linux-x86_64" ;;
+      Linux:aarch64|Linux:arm64) CMAKE_PLATFORM="linux-aarch64" ;;
+      Darwin:arm64|Darwin:x86_64) CMAKE_PLATFORM="macos-universal" ;;
+      *) unsupported_platform; return 1 ;;
+    esac
+
+    CMAKE_TAR_FILE="cmake-${CMAKE_VERSION}-${CMAKE_PLATFORM}.tar.gz"
+    mkdir -p "${CMAKE_DIR}"
+    curl -fL "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/${CMAKE_TAR_FILE}" -o "${HOME}/.local/${CMAKE_TAR_FILE}"
+    tar -xf "${HOME}/.local/${CMAKE_TAR_FILE}" -C "${CMAKE_DIR}" --strip-components=1
     rm -f "${HOME}/.local/${CMAKE_TAR_FILE}"
+
+    if [ "${PLATFORM_OS}" = "Darwin" ] ;
+    then
+      ln -s "${CMAKE_DIR}/CMake.app/Contents/bin" "${CMAKE_DIR}/bin"
+    fi
   fi
 }
 
@@ -199,10 +305,19 @@ function install_gh {
   if [ ! -f "${HOME}/.local/gh/bin/gh" ];
   then
     GH_VERSION="2.88.0"
-    GH_TAR_FILE="gh_${GH_VERSION}_linux_amd64.tar.gz"
-    wget "https://github.com/cli/cli/releases/download/v${GH_VERSION}/${GH_TAR_FILE}"
-    mkdir -p "${HOME}/.local/gh" && tar -zxvf "${GH_TAR_FILE}" -C "${HOME}/.local/gh" --strip-components=1
-    rm -f "${GH_TAR_FILE}"
+    case "${PLATFORM_OS}:${PLATFORM_ARCH}" in
+      Linux:x86_64) GH_PLATFORM="linux_amd64"; GH_EXTENSION="tar.gz" ;;
+      Linux:aarch64|Linux:arm64) GH_PLATFORM="linux_arm64"; GH_EXTENSION="tar.gz" ;;
+      Darwin:arm64) GH_PLATFORM="macOS_arm64"; GH_EXTENSION="zip" ;;
+      Darwin:x86_64) GH_PLATFORM="macOS_amd64"; GH_EXTENSION="zip" ;;
+      *) unsupported_platform; return 1 ;;
+    esac
+
+    GH_ARCHIVE="gh_${GH_VERSION}_${GH_PLATFORM}.${GH_EXTENSION}"
+    mkdir -p "${HOME}/.local/gh"
+    curl -fL "https://github.com/cli/cli/releases/download/v${GH_VERSION}/${GH_ARCHIVE}" -o "${HOME}/.local/${GH_ARCHIVE}"
+    tar -xf "${HOME}/.local/${GH_ARCHIVE}" -C "${HOME}/.local/gh" --strip-components=1
+    rm -f "${HOME}/.local/${GH_ARCHIVE}"
   fi
 }
 
@@ -214,11 +329,45 @@ function install_claude {
   fi
 }
 
-function install_opencode {
-  echo "Install opencode..."
-  if [ ! -f "${HOME}/.opencode/bin/opencode" ];
+function install_codex {
+  echo "Install codex..."
+  if [ ! -x "$(command -v codex)" ] ;
   then
-    curl -fsSL https://opencode.ai/install | bash
+    curl -fsSL https://chatgpt.com/codex/install.sh | sh
+  fi
+}
+
+function install_herdr {
+  echo "Install herdr..."
+  if [ ! -x "$(command -v herdr)" ] ;
+  then
+    curl -fsSL https://herdr.dev/install.sh | sh
+  fi
+
+  HERDR_CONFIG_PATH="${HOME}/.config/herdr"
+  mkdir -p "${HOME}/.config"
+
+  if [ -L "${HERDR_CONFIG_PATH}" ] ;
+  then
+    unlink "${HERDR_CONFIG_PATH}"
+  fi
+
+  if [ -e "${HERDR_CONFIG_PATH}" ] ;
+  then
+    rm -r "${HERDR_CONFIG_PATH}"
+  fi
+
+  ln -s "${DOTFILES}/herdr" "${HERDR_CONFIG_PATH}"
+
+  herdr plugin install bojackduy/nvim-herdr-navigation/herdr-vim-navigator
+}
+
+function install_uv {
+  echo "Install uv..."
+  if [ ! -x "$(command -v uv)" ] ;
+  then
+    mkdir -p "${HOME}/.local/bin"
+    curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="${HOME}/.local/bin" UV_NO_MODIFY_PATH=1 sh
   fi
 }
 
@@ -238,7 +387,11 @@ then
   install_cmake
   install_gh
   install_claude
-  install_opencode
+  install_codex
+  install_herdr
+  install_uv
+  install_starship
+  install_ghostty
 elif [ "${INSTALL_TARGET}" == "nvim" ] ;
 then
   install_nvim
@@ -272,6 +425,24 @@ then
 elif [ "${INSTALL_TARGET}" == "gh" ] ;
 then
   install_gh
+elif [ "${INSTALL_TARGET}" == "claude" ] ;
+then
+  install_claude
+elif [ "${INSTALL_TARGET}" == "codex" ] ;
+then
+  install_codex
+elif [ "${INSTALL_TARGET}" == "herdr" ] ;
+then
+  install_herdr
+elif [ "${INSTALL_TARGET}" == "uv" ] ;
+then
+  install_uv
+elif [ "${INSTALL_TARGET}" == "starship" ] ;
+then
+  install_starship
+elif [ "${INSTALL_TARGET}" == "ghostty" ] ;
+then
+  install_ghostty
 else
   echo "Not support: ${INSTALL_TARGET}"
   exit 1

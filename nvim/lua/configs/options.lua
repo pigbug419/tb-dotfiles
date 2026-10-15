@@ -49,12 +49,15 @@ vim.g.deprecation_warnings = false
 -- You can disable this for a buffer by setting `vim.b.trouble_lualine = false`
 vim.g.trouble_lualine = true
 
+-- clipboard
+if vim.uv.os_uname().sysname == "Linux" then
+  vim.g.clipboard = "osc52"
+end
+vim.opt.clipboard = "unnamedplus"
+
 local opt = vim.opt
 
 opt.autowrite = true -- Enable auto write
--- only set clipboard if not in ssh, to make sure the OSC 52
--- integration works automatically. Requires Neovim >= 0.10.0
-opt.clipboard = vim.env.SSH_TTY and "" or "unnamedplus" -- Sync with system clipboard
 opt.completeopt = "menu,menuone,noselect"
 opt.conceallevel = 2 -- Hide * markup for bold and italic, but not markers with substitutions
 opt.confirm = true -- Confirm to save changes before exiting modified buffer

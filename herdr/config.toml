@@ -1,0 +1,96 @@
+onboarding = false
+
+[theme]
+name = "catppuccin"
+auto_switch = true
+light_name = "catppuccin-latte"
+dark_name = "catppuccin"
+
+# monokai
+[theme.custom]
+# Backgrounds
+panel_bg = "#272822"
+sidebar_bg = "#272822"
+surface0 = "#272822"
+surface1 = "#3E3D32"
+surface_dim = "#1E1F1C"
+overlay0 = "#49483E"
+overlay1 = "#75715E"
+
+# Sidebar selection
+active_row_bg = "#3E3D32"
+selection_bg = "#49483E"
+
+# Foreground
+text = "#F8F8F2"
+subtext0 = "#A59F85"
+
+# Accent
+accent = "#A6E22E"
+
+# Monokai colors
+red = "#F92672"
+green = "#A6E22E"
+yellow = "#E6DB74"
+blue = "#66D9EF"
+teal = "#66D9EF"
+mauve = "#AE81FF"
+peach = "#FD971F"
+
+# papercolor
+# [theme.custom]
+# sidebar_bg = "#e8e8e8"
+# active_row_bg = "#d0d0d0"
+# accent = "#d70087"
+# surface0 = "#c6c6c6"
+# surface1 = "#bcbcbc"
+# overlay0 = "#a8a8a8"
+# overlay1 = "#949494"
+# panel_bg = "#e8e8e8"
+# text = "#444444"
+
+[ui]
+sidebar_start_collapsed = true
+sidebar_collapsed_mode = "hidden"
+pane_borders = "auto"
+pane_gaps = false
+pane_outer_borders = false
+show_agent_labels_on_pane_borders = false
+mouse_capture = true
+prompt_new_tab_name = false
+confirm_close = false
+agent_panel_scope = "current"
+
+[keys]
+prefix = "ctrl+b"
+split_vertical = "prefix+%"
+split_horizontal = "prefix+\""
+detach = "prefix+d"
+# focus_pane_left = ""
+# focus_pane_down = ""
+# focus_pane_up = ""
+# focus_pane_right = ""
+
+# [[keys.command]]
+# key = "ctrl+h"
+# type = "plugin_action"
+# command = "local.vim-navigator.left"
+# description = "Vim-aware pane left"
+
+# [[keys.command]]
+# key = "ctrl+j"
+# type = "plugin_action"
+# command = "local.vim-navigator.down"
+# description = "Vim-aware pane down"
+
+# [[keys.command]]
+# key = "ctrl+k"
+# type = "plugin_action"
+# command = "local.vim-navigator.up"
+# description = "Vim-aware pane up"
+
+# [[keys.command]]
+# key = "ctrl+l"
+# type = "plugin_action"
+# command = "local.vim-navigator.right"
+# description = "Vim-aware pane right"

@@ -1,0 +1,48 @@
+# ─────────────────────────────
+# Font
+# ─────────────────────────────
+font-family = Maple Mono NF
+font-family = GoogleSansCode Nerd Font Mono
+font-family = CodeNewRoman Nerd Font Mono
+font-family = RobotoMono Nerd Font Mono
+font-family = 0xProto Nerd Font Mono
+font-family = D2KodingLigature Nerd Font Mono
+font-size = 16
+font-thicken = true
+font-thicken-strength = 0
+
+# ─────────────────────────────
+# Theme
+# ─────────────────────────────
+# theme = papercolor-light
+theme = Monokai Classic
+
+# ─────────────────────────────
+# Window
+# ─────────────────────────────
+window-padding-x = 10
+window-padding-y = 10
+
+window-width = 120
+window-height = 35
+
+window-decoration = true
+
+background-opacity = 1.0
+background-blur-radius = 0
+
+unfocused-split-opacity = 0.85
+
+macos-titlebar-style = transparent
+
+maximize = true
+
+working-directory = home
+window-inherit-working-directory = false
+tab-inherit-working-directory = true
+
+# ─────────────────────────────
+# Cursor
+# ─────────────────────────────
+cursor-style = block
+cursor-style-blink = false

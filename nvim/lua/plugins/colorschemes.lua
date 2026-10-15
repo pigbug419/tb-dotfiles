@@ -22,22 +22,22 @@ return {
           functions = { bold = true },
           variables = {},
           -- Background styles. Can be "dark", "transparent" or "normal"
-          sidebars = "dark", -- style for sidebars, see below
-          floats = "dark", -- style for floating windows
+          sidebars = "normal", -- style for sidebars, see below
+          floats = "normal", -- style for floating windows
         },
         sidebars = { "qf", "help" }, -- Set a darker background on sidebar-like windows. For example: `["qf", "vista_kind", "terminal", "packer"]`
-        day_brightness = 0.3, -- Adjusts the brightness of the colors of the **Day** style. Number between 0 and 1, from dull to vibrant colors
+        day_brightness = 0.2, -- Adjusts the brightness of the colors of the **Day** style. Number between 0 and 1, from dull to vibrant colors
         hide_inactive_statusline = true, -- Enabling this option, will hide inactive statuslines and replace them with a thin border instead. Should work with the standard **StatusLine** and **LuaLine**.
-        dim_inactive = true, -- dims inactive windows
+        dim_inactive = false, -- dims inactive windows
         lualine_bold = true, -- When `true`, section headers in the lualine theme will be bold
 
         --- You can override specific color groups to use other groups or a hex color
         --- function will be called with a ColorScheme table
         ---@param colors ColorScheme
         on_colors = function(c)
-          local old_bg = c.bg
-          c.bg = "#e6e7ec"
-          c.bg_dark = old_bg
+          -- local old_bg = c.bg
+          -- c.bg = "#e6e7ec"
+          -- c.bg_dark = old_bg
         end,
 
         --- You can override specific highlights to use other groups or a hex color
@@ -45,24 +45,60 @@ return {
         ---@param highlights Highlights
         ---@param colors ColorScheme
         on_highlights = function(hl, c)
-          hl.NvimTreeNormal = { bg = c.bg_dark }
-          hl.NvimTreeNormalNC = { bg = c.bg_dark }
-          hl.NvimTreeEndOfBuffer = { fg = c.bg_dark, bg = c.bg_dark }
-          hl.TelescopeNormal = { bg = c.bg_dark }
-          hl.TelescopeBorder = { fg = c.bg_highlight, bg = c.bg_dark }
-          hl.TelescopePromptNormal = { bg = c.bg_dark }
-          hl.TelescopePromptBorder = { fg = c.bg_highlight, bg = c.bg_dark }
-          hl.TelescopeResultsNormal = { bg = c.bg_dark }
-          hl.TelescopeResultsBorder = { fg = c.bg_highlight, bg = c.bg_dark }
-          hl.TelescopePreviewNormal = { bg = c.bg_dark }
-          hl.TelescopePreviewBorder = { fg = c.bg_highlight, bg = c.bg_dark }
-          hl.TelescopeSelection = { bg = c.bg_highlight }
-          hl.TelescopeSelectionCaret = { fg = c.blue, bg = c.bg_highlight }
-          hl.TelescopeMatching = { fg = c.blue, bold = true }
-          hl.TelescopeTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
-          hl.TelescopePromptTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
-          hl.TelescopeResultsTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
-          hl.TelescopePreviewTitle = { fg = c.blue, bg = c.bg_dark, bold = true }
+          -- Neo-tree
+          hl.NeoTreeNormal = { bg = c.bg }
+          hl.NeoTreeNormalNC = { bg = c.bg }
+          hl.NeoTreeWinSeparator = {
+            fg = c.border,
+            bg = c.bg,
+          }
+
+          -- Trouble
+          hl.TroubleNormal = { bg = c.bg }
+
+          -- popup menus
+          hl.Pmenu = {
+            bg = c.bg_float,
+          }
+
+          hl.PmenuSel = {
+            bg = c.bg_highlight,
+            bold = true,
+          }
+
+          -- search
+          hl.Search = {
+            bg = c.yellow,
+            fg = c.bg,
+          }
+
+          hl.IncSearch = {
+            bg = c.orange,
+            fg = c.bg,
+          }
+
+          -- diagnostics는 underline 위주로
+          hl.DiagnosticUnderlineError = {
+            undercurl = true,
+            sp = c.error,
+          }
+          hl.DiagnosticUnderlineWarn = {
+            undercurl = true,
+            sp = c.warning,
+          }
+          hl.WinSeparator = {
+            fg = c.blue7,
+          }
+
+          hl.StatusLine = {
+            bg = c.bg_highlight,
+            fg = c.fg,
+          }
+
+          hl.StatusLineNC = {
+            bg = c.bg_dark,
+            fg = c.dark5,
+          }
         end,
 
         cache = true, -- When set to true, the theme will be cached for better performance
@@ -307,7 +343,7 @@ return {
         flavour = "auto", -- latte, frappe, macchiato, mocha
         background = { -- :h background
           light = "latte",
-          dark = "macchiato",
+          dark = "frappe",
         },
         transparent_background = false, -- disables setting the background color.
         show_end_of_buffer = false, -- shows the '~' characters after the end of buffers
@@ -481,10 +517,6 @@ return {
           integrations = {
             window_picker = true,
             diffview = true,
-            telescope = {
-              enabled = true,
-              style = "nvchad",
-            },
           },
         },
         custom_highlights = function(colors)
@@ -524,7 +556,6 @@ return {
           cmp = true,
           gitsigns = true,
           native_lsp = { enabled = true, inlay_hints = { background = true } },
-          nvimtree = true,
           treesitter = true,
           notify = false,
           mini = {
@@ -547,7 +578,7 @@ return {
               LspInfoBorder = { link = "FloatBorder" },
               NeoTreeDirectoryIcon = { fg = colors.subtext1 },
               NeoTreeDirectoryName = { fg = colors.subtext1 },
-              NeoTreeFloatBorder = { link = "TelescopeResultsBorder" },
+              NeoTreeFloatBorder = { link = "FloatBorder" },
               NeoTreeGitConflict = { fg = colors.red },
               NeoTreeGitDeleted = { fg = colors.red },
               NeoTreeGitIgnored = { fg = colors.overlay0 },
@@ -567,18 +598,6 @@ return {
               NormalFloat = { bg = colors.base },
               Pmenu = { bg = colors.mantle, fg = "" },
               PmenuSel = { bg = colors.surface0, fg = "" },
-              TelescopePreviewBorder = { bg = colors.crust, fg = colors.crust },
-              TelescopePreviewNormal = { bg = colors.crust },
-              TelescopePreviewTitle = { fg = colors.crust, bg = colors.crust },
-              TelescopePromptBorder = { bg = colors.surface0, fg = colors.surface0 },
-              TelescopePromptCounter = { fg = colors.mauve, style = { "bold" } },
-              TelescopePromptNormal = { bg = colors.surface0 },
-              TelescopePromptPrefix = { bg = colors.surface0 },
-              TelescopePromptTitle = { fg = colors.surface0, bg = colors.surface0 },
-              TelescopeResultsBorder = { bg = colors.mantle, fg = colors.mantle },
-              TelescopeResultsNormal = { bg = colors.mantle },
-              TelescopeResultsTitle = { fg = colors.mantle, bg = colors.mantle },
-              TelescopeSelection = { bg = colors.surface0 },
               VertSplit = { bg = colors.base, fg = colors.surface0 },
               WhichKeyFloat = { bg = colors.mantle },
               YankHighlight = { bg = colors.surface2 },
@@ -809,6 +828,14 @@ return {
               PreProc = { fg = colors.green },
               PreCondit = { fg = colors.green, style = { "bold" } },
               Macro = { fg = "#C4BE89" },
+              NeoTreeNormal = { fg = colors.text, bg = colors.base },
+              NeoTreeNormalNC = { link = "NormalNC" },
+              NeoTreeCursorLine = { bg = colors.surface0 },
+              IblIndent = { fg = colors.mantle },
+              IblScope = { fg = colors.surface1 },
+              LineNr = { fg = colors.surface1 },
+              TroubleNormal = { bg = colors.base },
+              TroubleNormalNC = { bg = colors.base },
               ["@type.builtin"] = { fg = colors.blue, style = { "bold" } },
               ["@variable"] = { fg = colors.text },
               ["@variable.declaration"] = { fg = colors.text },
@@ -821,28 +848,12 @@ return {
           end,
           latte = function(colors)
             return {
+              NeoTreeNormal = { fg = colors.text, bg = colors.base },
+              NeoTreeNormalNC = { link = "NormalNC" },
+              NeoTreeCursorLine = { bg = colors.surface0 },
               IblIndent = { fg = colors.mantle },
               IblScope = { fg = colors.surface1 },
               LineNr = { fg = colors.surface1 },
-              NvimTreeCursorLine = { bg = colors.surface0 },
-              NvimTreeNormal = { bg = colors.base },
-              NvimTreeNormalNC = { bg = colors.base },
-              NvimTreeEndOfBuffer = { fg = colors.base, bg = colors.base },
-              TelescopeNormal = { bg = colors.base },
-              TelescopeBorder = { fg = colors.blue, bg = colors.mantle },
-              TelescopePromptNormal = { bg = colors.base },
-              TelescopePromptBorder = { fg = colors.blue, bg = colors.base },
-              TelescopeResultsNormal = { bg = colors.base },
-              TelescopeResultsBorder = { fg = colors.blue, bg = colors.base },
-              TelescopePreviewNormal = { bg = colors.base },
-              TelescopePreviewBorder = { fg = colors.blue, bg = colors.base },
-              TelescopeSelection = { bg = colors.surface0 },
-              TelescopeSelectionCaret = { fg = colors.sky, bg = colors.base },
-              TelescopeMatching = { fg = colors.sky, bold = true },
-              TelescopeTitle = { fg = colors.blue, bg = colors.base, bold = true },
-              TelescopePromptTitle = { fg = colors.blue, bg = colors.base, bold = true },
-              TelescopeResultsTitle = { fg = colors.blue, bg = colors.base, bold = true },
-              TelescopePreviewTitle = { fg = colors.blue, bg = colors.base, bold = true },
               TroubleNormal = { bg = colors.base },
               TroubleNormalNC = { bg = colors.base },
             }
@@ -982,7 +993,7 @@ return {
         },
         plugins = { -- Uncomment the plugins that you use to highlight them
           -- Available plugins:
-          -- "blink",
+          "blink",
           -- "coc",
           -- "colorful-winsep",
           -- "dap",
@@ -997,7 +1008,7 @@ return {
           "indent-blankline",
           -- "lspsaga",
           -- "mini",
-          -- "neo-tree",
+          "neo-tree",
           "neogit",
           -- "neorg",
           -- "neotest",
@@ -1005,11 +1016,9 @@ return {
           "nvim-cmp",
           "nvim-navic",
           "nvim-notify",
-          "nvim-tree",
           "nvim-web-devicons",
           -- "rainbow-delimiters",
           -- "sneak",
-          "telescope",
           "trouble",
           "which-key",
         },

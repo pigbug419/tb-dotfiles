@@ -3,7 +3,7 @@
 
 # Use custom format
 format = '''
-$hostname$directory$time$git_branch$git_commit$git_state$git_metrics$git_status$conda$python$character
+$hostname$directory$time$python$git_branch$git_commit$git_state$git_metrics$git_status$conda$character
 '''
 
 # Inserts a blank line between shell prompts
@@ -43,7 +43,7 @@ ignore_base = false
 
 [python]
 format = '([\[$virtualenv\]]($style))'
-style = 'bold yellow'
+style = 'bold #7FD8BE'
 
 [time]
 format = '[\[$time\]]($style)'

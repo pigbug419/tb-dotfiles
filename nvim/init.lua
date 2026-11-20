@@ -48,8 +48,12 @@ vim.api.nvim_create_autocmd("FileType", {
     "markdown",
     "proto",
   },
-  callback = function()
-    vim.treesitter.start()
+  callback = function(event)
+    if not vim.treesitter.get_parser(event.buf) then
+      return
+    end
+
+    vim.treesitter.start(event.buf)
     vim.wo[0][0].foldexpr = "v:lua.vim.treesitter.foldexpr()"
     vim.wo[0][0].foldmethod = "expr"
   end,

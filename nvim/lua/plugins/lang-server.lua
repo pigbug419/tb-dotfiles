@@ -21,14 +21,13 @@ return {
   },
   {
     "mason-org/mason-lspconfig.nvim",
-    opts = {
-      ensure_installed = {
-        "lua_ls",
-        "rust_analyzer",
-        "clangd",
-        "pyright",
-      }
-    },
+    opts = function()
+      local ensure_installed = { "lua_ls", "rust_analyzer", "pyright" }
+      if vim.fn.executable("clangd") == 0 then
+        table.insert(ensure_installed, "clangd")
+      end
+      return { ensure_installed = ensure_installed }
+    end,
     dependencies = {
       { "mason-org/mason.nvim", opts = {} },
       "neovim/nvim-lspconfig",

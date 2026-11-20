@@ -125,10 +125,8 @@ return {
       -- elsewhere in your config, without redefining it, due to `opts_extend`
       sources = { default = { "lsp", "path", "snippets", "buffer" } },
 
-      -- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
-      -- You may use a lua implementation instead by using `implementation = "lua"`
-      -- See the fuzzy documentation for more information
-      fuzzy = { implementation = "rust" },
+      -- Fall back to Lua if the native matcher is unavailable.
+      fuzzy = { implementation = "prefer_rust" },
     },
   },
 }
